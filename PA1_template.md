@@ -94,10 +94,42 @@ Aggregating dataset by intervals to a new dataframe (timeLapse) and applying ?me
 
 ```r
 timeLapse <- aggregate(dataset$steps, by = list(interval = dataset$interval), FUN = mean, na.rm = TRUE);
+head(timeLapse);
+```
+
+```
+##   interval       x
+## 1        0 1.71698
+## 2        5 0.33962
+## 3       10 0.13208
+## 4       15 0.15094
+## 5       20 0.07547
+## 6       25 2.09434
+```
+
+```r
 plot(timeLapse, main = "Average No of steps during the day", xlab = "Interval", ylab = "No of steps", type = "l");
 ```
 
 ![plot of chunk unnamed-chunk-5](./PA1_template_files/figure-html/unnamed-chunk-5.png) 
+
+```r
+## which intervale contains the max number of steps:
+max <- max(timeLapse$x);
+max;
+```
+
+```
+## [1] 206.2
+```
+
+```r
+timeLapse$interval[timeLapse$x == max];
+```
+
+```
+## [1] 835
+```
 
 To make the graph more readable, let's rename interval codes to the real time during the day in hours. Create a timeline vector (with intervals every 5 min, in hours), add it to the timeLapse table and make a plot. 10PM-5.30AM looks like sleeping time, and 8-10AM is a running time :)
 
