@@ -59,7 +59,7 @@ max;
 timeLapse$interval[timeLapse$x == max];
 ```
 
-To make the graph more readable, let's rename interval codes to the real time during the day in hours. Create a timeline vector (with intervals every 5 min, in hours), add it to the timeLapse table and make a plot. 10PM-5.30AM looks like sleeping time, and 8-10AM is a running time :)
+To make the graph more readable, let's rename interval codes to the real time during the day in hours. Create a timeline vector (with intervals every 5 min, in hours), add it to the timeLapse table and make a plot.
 
 
 ```{r, echo=TRUE}
@@ -67,6 +67,9 @@ timeLine <- c(seq(length = 288, from = 0, by = 0.0833333));
 timeLapse$TimeLine <- timeLine;
 plot(timeLapse$TimeLine, timeLapse$x, main = "Average No of steps during the hours of the day", xlab = "Timeline, hours", ylab = "No of steps", type = "l");
 ```
+
+10PM-5.30AM looks like sleeping time, and 8-10AM is a running time :)
+
 
 ## Imputing missing values
 
@@ -151,6 +154,7 @@ replaceDays <- function(x) {
 
 ##replace - apply function to "day" column and add resulting vector to the filledDataset:
 replacedDays <- lapply(filledDataset$day, replaceDays);
+replacedDays <- as.character(replacedDays);
 filledDataset$replacedDays <- replacedDays
 
 ## show head of resulting table:
@@ -159,6 +163,24 @@ head(filledDataset);
 
 And build panel plot for weekdays and weekends (aggegate and add timeline first, as in previous step for linear graph):
 
+```{r, echo=TRUE}
+filledTimeLapse <- aggregate(filledDataset$filledSteps, by = list(interval = filledDataset$interval, day = filledDataset$replacedDays), FUN = mean, na.rm = TRUE);
+head(filledTimeLapse);
 
-Unfortunately, I didn't have enough time to finish this last task :( 
+library(ggplot2);
+panel_plot <- ggplot(filledTimeLapse, aes(x=interval, y=x)) + geom_line() +
+    ggtitle("Average activity in weekdays and weekends") + ylab("Average No of steps");
+panel_plot + facet_grid(day ~ .);
+```
 
+Let's try to add the timeLine!
+
+```{r, echo=TRUE}
+filledTimeLapse$TimeLine <- timeLine;
+
+panel_plot <- ggplot(filledTimeLapse, aes(x=TimeLine, y=x)) + geom_line() +
+    ggtitle("Average activity in weekdays and weekends") + xlab("Interval, hours") + ylab("Average No of steps");
+panel_plot + facet_grid(day ~ .);
+```
+
+Love the results - on weekend the person is sleeping longer, staying awake late, but have more steps during the day (job during the weekday is not keeping us healthy :)!
